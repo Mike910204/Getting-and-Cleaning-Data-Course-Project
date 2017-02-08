@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title></title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>#Librerias
+library(dplyr)
+library(reshape2)
+library(tidyr)
+library(plyr)</p>
+
+<p>#Set the working directory (modify to the directory needed, the files should be there)
+setwd(&ldquo;C:/Users/aguimi05/Documents/R/getdata%2Fprojectfiles%2FUCI HAR Dataset/UCI HAR Dataset/&rdquo;)</p>
+
+<p>##Read files from training and test</p>
+
+<p>#Labels
+activity_labels&lt;-read.table(&ldquo;activity_labels.txt&rdquo;,col.names=c(&ldquo;Activity&rdquo;,&ldquo;Activity_Name&rdquo;))</p>
+
+<p>train_labels&lt;-data.frame(read.table(&ldquo;train/y_train.txt&rdquo;,col.names=&ldquo;Activity&rdquo;),stringsAsFactors=FALSE)
+test_labels&lt;-data.frame(read.table(&ldquo;test/y_test.txt&rdquo;,col.names=&ldquo;Activity&rdquo;),stringsAsFactors=FALSE)</p>
+
+<p>#SETS
+train_trainig_set&lt;-data.frame(read.table(&ldquo;train/X_train.txt&rdquo;),stringsAsFactors=FALSE)
+test_trainig_set&lt;-data.frame(read.table(&ldquo;test/X_test.txt&rdquo;),stringsAsFactors=FALSE)</p>
+
+<p>#Subjects
+train_subject&lt;-data.frame(read.table(&ldquo;train/subject_train.txt&rdquo;,col.names=&ldquo;Person&rdquo;),stringsAsFactors=FALSE)
+test_subject&lt;-data.frame(read.table(&ldquo;test/subject_test.txt&rdquo;,col.names=&ldquo;Person&rdquo;),stringsAsFactors=FALSE)</p>
+
+<p>unique(train_labels)</p>
+
+<p>#union subject-labels
+train_set&lt;-cbind(train_labels,train_subject)
+train_set&lt;-cbind(train_set,train_trainig_set)
+test_set&lt;-cbind(test_labels,test_subject)
+test_set&lt;-cbind(test_set,test_trainig_set)</p>
+
+<p>#Features&#39; names
+features&lt;-read.table(&ldquo;features.txt&rdquo;,head=FALSE)
+subfeatures&lt;-c(&ldquo;Activity&rdquo;,&ldquo;Person&rdquo;,as.character(features$V2[grep(&ldquo;mean\(\)|std\(\)&rdquo;, features$V2)]))
+features&lt;-features[,2]
+features&lt;-as.character(features)
+features&lt;-as.character(c(&ldquo;Activity&rdquo;,&ldquo;Person&rdquo;,features))
+subfeatures&lt;-as.character(subfeatures)
+features&lt;-gsub(&ldquo;<sup>t&rdquo;,&ldquo;Time&rdquo;,features)</sup>
+features&lt;-gsub(&ldquo;<sup>f&rdquo;,&ldquo;Frequency&rdquo;,features)</sup>
+features&lt;-gsub(&ldquo;Acc&rdquo;,&ldquo;Acceleration&rdquo;,features)
+features&lt;-gsub(&ldquo;Mag&rdquo;,&ldquo;MAgnitude&rdquo;,features)
+features&lt;-gsub(&ldquo;Gyro&rdquo;,&ldquo;Gyroscope&rdquo;,features)
+subfeatures&lt;-gsub(&ldquo;<sup>t&rdquo;,&ldquo;Time&rdquo;,subfeatures)</sup>
+subfeatures&lt;-gsub(&ldquo;<sup>f&rdquo;,&ldquo;Frequency&rdquo;,subfeatures)</sup>
+subfeatures&lt;-gsub(&ldquo;Acc&rdquo;,&ldquo;Acceleration&rdquo;,subfeatures)
+subfeatures&lt;-gsub(&ldquo;Mag&rdquo;,&ldquo;MAgnitude&rdquo;,subfeatures)
+subfeatures&lt;-gsub(&ldquo;Gyro&rdquo;,&ldquo;Gyroscope&rdquo;,subfeatures)</p>
+
+<p>#name data set
+names(test_set)&lt;-features
+names(train_set)&lt;-features</p>
+
+<p>#Merge labels
+test_set&lt;-subset(test_set,select=subfeatures)
+train_set&lt;-subset(train_set,select=subfeatures)
+test_set&lt;-left_join(test_set,activity_labels,by=&ldquo;Activity&rdquo;)
+train_set&lt;-left_join(train_set,activity_labels,by=&ldquo;Activity&rdquo;)
+a&lt;-c(names(test_set),&ldquo;Tipo&rdquo;)
+b&lt;-c(names(test_set),&ldquo;Tipo&rdquo;)
+test_set&lt;-mutate(test_set,Tipo=&ldquo;Test&rdquo;)
+train_set&lt;-mutate(train_set,Tipo=&ldquo;Train&rdquo;)
+data_set&lt;-rbind(test_set,train_set)
+data_set&lt;-select(data_set,-c(1,70))</p>
+
+<p>#Average of each variable for each activity and each subject.
+data_set&lt;-aggregate(. ~Person + Activity_Name, data_set, mean)
+data_set&lt;-data_set[order(data_set$Person,data_set$Activity_Name),]
+View(data_set)
+write.table(data_set,file=&ldquo;data_set.txt&rdquo;,row.names = FALSE)</p>
+
+</body>
+
+</html>
