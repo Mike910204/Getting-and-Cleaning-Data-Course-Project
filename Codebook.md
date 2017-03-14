@@ -32,7 +32,8 @@ train_set<-cbind(train_set,train_trainig_set)
 test_set<-cbind(test_labels,test_subject)
 test_set<-cbind(test_set,test_trainig_set)
 
-#Features' names
+#Features' names#
+
 features<-read.table("features.txt",head=FALSE)
 subfeatures<-c("Activity","Person",as.character(features$V2[grep("mean\\(\\)|std\\(\\)", features$V2)]))
 features<-features[,2]
