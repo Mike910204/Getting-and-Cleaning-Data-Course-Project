@@ -1,5 +1,7 @@
 # Getting-and-Cleaning-Data-Course-Project
+
 #Libraries used to run the code
+
 library(dplyr)
 library(reshape2)
 library(tidyr)
@@ -7,16 +9,19 @@ library(plyr)
 
 #Set the working directory (modify to the directory needed, the files should be there)
 ##Here you have to set the working directory where the data files are. 
+
 setwd("C:/Users/aguimi05/Documents/R/getdata%2Fprojectfiles%2FUCI HAR Dataset/UCI HAR Dataset/")
 
 #Read files from training and test
 ##Al the tables where the data is saved have descriptive names
 ##Labels
+
 activity_labels<-read.table("activity_labels.txt",col.names=c("Activity","Activity_Name"))
 train_labels<-data.frame(read.table("train/y_train.txt",col.names="Activity"),stringsAsFactors=FALSE)
 test_labels<-data.frame(read.table("test/y_test.txt",col.names="Activity"),stringsAsFactors=FALSE)
 
 ##SETS
+
 train_trainig_set<-data.frame(read.table("train/X_train.txt"),stringsAsFactors=FALSE)
 test_trainig_set<-data.frame(read.table("test/X_test.txt"),stringsAsFactors=FALSE)
 
