@@ -88,5 +88,5 @@ data_set<-data_set[order(data_set$Person,data_set$Activity_Name),]
 View(data_set)
 write.table(data_set,file="data_set.txt",row.names = FALSE)
 
-##The code gets saved in txt table data set.
+###The code gets saved in txt table data set.
 
