@@ -1,75 +1,101 @@
-#Librerias
-library(dplyr)
-library(reshape2)
-library(tidyr)
-library(plyr)
+#Human Activity Recognition Using Smartphones Data Set Project
 
-#Set the working directory (modify to the directory needed, the files should be there)
-setwd("C:/Users/aguimi05/Documents/R/getdata%2Fprojectfiles%2FUCI HAR Dataset/UCI HAR Dataset/")
+##The analysis made in this project consisted in managing the information in a way we could have a tidy data for further analysis.
+The data used was obtained from the webpage: http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones where the experiments have been carried out with a group of 30 volunteers within an age bracket of 19-48 years. Each person performed six activities (WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING) wearing a smartphone (Samsung Galaxy S II) on the waist. Using its embedded accelerometer and gyroscope, we captured 3-axial linear acceleration and 3-axial angular velocity at a constant rate of 50Hz. The experiments have been video-recorded to label the data manually. The obtained dataset has been randomly partitioned into two sets, where 70% of the volunteers was selected for generating the training data and 30% the test data. 
 
-##Read files from training and test
+The features selected for this database come from the accelerometer and gyroscope 3-axial raw signals tAcc-XYZ and tGyro-XYZ. These time domain signals (prefix 't' to denote time) were captured at a constant rate of 50 Hz. Then they were filtered using a median filter and a 3rd order low pass Butterworth filter with a corner frequency of 20 Hz to remove noise. Similarly, the acceleration signal was then separated into body and gravity acceleration signals (tBodyAcc-XYZ and tGravityAcc-XYZ) using another low pass Butterworth filter with a corner frequency of 0.3 Hz. 
 
-#Labels
-activity_labels<-read.table("activity_labels.txt",col.names=c("Activity","Activity_Name"))
+Subsequently, the body linear acceleration and angular velocity were derived in time to obtain Jerk signals (tBodyAccJerk-XYZ and tBodyGyroJerk-XYZ). Also the magnitude of these three-dimensional signals were calculated using the Euclidean norm (tBodyAccMag, tGravityAccMag, tBodyAccJerkMag, tBodyGyroMag, tBodyGyroJerkMag). 
 
-train_labels<-data.frame(read.table("train/y_train.txt",col.names="Activity"),stringsAsFactors=FALSE)
-test_labels<-data.frame(read.table("test/y_test.txt",col.names="Activity"),stringsAsFactors=FALSE)
+Finally a Fast Fourier Transform (FFT) was applied to some of these signals producing fBodyAcc-XYZ, fBodyAccJerk-XYZ, fBodyGyro-XYZ, fBodyAccJerkMag, fBodyGyroMag, fBodyGyroJerkMag. (Note the 'f' to indicate frequency domain signals). 
+
+These signals were used to estimate variables of the feature vector for each pattern:  
+'-XYZ' is used to denote 3-axial signals in the X, Y and Z directions.
+
+tBodyAcc-XYZ
+
+tGravityAcc-XYZ
+
+tBodyAccJerk-XYZ
+
+tBodyGyro-XYZ
+
+tBodyGyroJerk-XYZ
+
+tBodyAccMag
+
+tGravityAccMag
+
+tBodyAccJerkMag
+
+tBodyGyroMag
+
+tBodyGyroJerkMag
+
+fBodyAcc-XYZ
+
+fBodyAccJerk-XYZ
+
+fBodyGyro-XYZ
+
+fBodyAccMag
+
+fBodyAccJerkMag
+
+fBodyGyroMag
+
+fBodyGyroJerkMag
 
 
-#SETS
-train_trainig_set<-data.frame(read.table("train/X_train.txt"),stringsAsFactors=FALSE)
-test_trainig_set<-data.frame(read.table("test/X_test.txt"),stringsAsFactors=FALSE)
+###The set of variables that were estimated from these signals are: 
 
-#Subjects
-train_subject<-data.frame(read.table("train/subject_train.txt",col.names="Person"),stringsAsFactors=FALSE)
-test_subject<-data.frame(read.table("test/subject_test.txt",col.names="Person"),stringsAsFactors=FALSE)
+mean(): Mean value
 
-unique(train_labels)
+std(): Standard deviation
 
-#union subject-labels
-train_set<-cbind(train_labels,train_subject)
-train_set<-cbind(train_set,train_trainig_set)
-test_set<-cbind(test_labels,test_subject)
-test_set<-cbind(test_set,test_trainig_set)
+mad(): Median absolute deviation 
 
-#Features' names
-features<-read.table("features.txt",head=FALSE)
-subfeatures<-c("Activity","Person",as.character(features$V2[grep("mean\\(\\)|std\\(\\)", features$V2)]))
-features<-features[,2]
-features<-as.character(features)
-features<-as.character(c("Activity","Person",features))
-subfeatures<-as.character(subfeatures)
-features<-gsub("^t","Time",features)
-features<-gsub("^f","Frequency",features)
-features<-gsub("Acc","Acceleration",features)
-features<-gsub("Mag","MAgnitude",features)
-features<-gsub("Gyro","Gyroscope",features)
-subfeatures<-gsub("^t","Time",subfeatures)
-subfeatures<-gsub("^f","Frequency",subfeatures)
-subfeatures<-gsub("Acc","Acceleration",subfeatures)
-subfeatures<-gsub("Mag","MAgnitude",subfeatures)
-subfeatures<-gsub("Gyro","Gyroscope",subfeatures)
+max(): Largest value in array
 
-#name data set
-names(test_set)<-features
-names(train_set)<-features
+min(): Smallest value in array
 
-#Merge labels
-test_set<-subset(test_set,select=subfeatures)
-train_set<-subset(train_set,select=subfeatures)
-test_set<-left_join(test_set,activity_labels,by="Activity")
-train_set<-left_join(train_set,activity_labels,by="Activity")
-a<-c(names(test_set),"Tipo")
-b<-c(names(test_set),"Tipo")
-test_set<-mutate(test_set,Tipo="Test")
-train_set<-mutate(train_set,Tipo="Train")
-data_set<-rbind(test_set,train_set)
-data_set<-select(data_set,-c(1,70))
+sma(): Signal magnitude area
 
-#Average of each variable for each activity and each subject.
-data_set<-aggregate(. ~Person + Activity_Name, data_set, mean)
-data_set<-data_set[order(data_set$Person,data_set$Activity_Name),]
-View(data_set)
-write.table(data_set,file="data_set.txt",row.names = FALSE)
+energy(): Energy measure. Sum of the squares divided by the number of values. 
 
-knit2html("C:/Users/aguimi05/Documents/R/run_analysis.r","codebook.Rmd")
+iqr(): Interquartile range 
+
+entropy(): Signal entropy
+
+arCoeff(): Autorregresion coefficients with Burg order equal to 4
+
+correlation(): correlation coefficient between two signals
+
+maxInds(): index of the frequency component with largest magnitude
+
+meanFreq(): Weighted average of the frequency components to obtain a mean frequency
+
+skewness(): skewness of the frequency domain signal 
+
+kurtosis(): kurtosis of the frequency domain signal 
+
+bandsEnergy(): Energy of a frequency interval within the 64 bins of the FFT of each window.
+
+angle(): Angle between to vectors.
+
+
+###Additional vectors obtained by averaging the signals in a signal window sample. These are used on the angle() variable:
+
+gravityMean
+
+tBodyAccMean
+
+tBodyAccJerkMean
+
+tBodyGyroMean
+
+tBodyGyroJerkMean
+
+
+One you run the program in r run analyisis and being careful at preserving the way files were downloaded.
+The code as a result will output a .txt file with the data set with more descriptive variables and just the one containing the mean or standard deviation.
